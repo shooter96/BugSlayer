@@ -1,0 +1,96 @@
+import os
+import sys
+
+import pytest
+from playwright.sync_api import sync_playwright
+from pathlib import Path
+from common.data_manager import DataManager
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+@pytest.fixture(scope="session")
+def setup_browser(browser_type=None):
+    """
+    设置浏览器环境
+
+    Args:
+        browser_type (str, optional): 浏览器类型，支持 'chromium', 'firefox', 'webkit'。
+                                    如果为None，则使用配置中的browser_type
+
+    Returns:
+        dict: 包含 playwright, browser, context, page 的字典对象
+    """
+    # 加载配置文件
+    config_path = str(Path(__file__).parent / "conf" / "env_config.yaml")
+    config = DataManager.load_yaml(config_path)
+    playwright = sync_playwright().start()
+
+    # 确定要使用的浏览器类型
+    if browser_type is None:
+        browser_type = config.get('browser_type', 'chromium')
+
+    # 准备浏览器启动参数
+    launch_options = {
+        'headless': config['headless'],
+        'slow_mo': config['slow_mo']
+    }
+    
+    # 如果需要客户端证书，可以通过启动参数配置（仅适用于 Chromium）
+    cert_dir = Path(__file__).parent / "ssl_cert" / "hz"
+    cert_file = cert_dir / "converted_client.crt"
+    key_file = cert_dir / "converted_client.key"
+    
+    if browser_type in ['chromium', 'msedge'] and cert_file.exists() and key_file.exists():
+        # 注意：这种方式需要证书文件在文件系统中可访问
+        launch_options['args'] = [
+            f'--client-certificate-file={cert_file}',
+            f'--client-certificate-key={key_file}',
+            '--ignore-certificate-errors',
+            '--ignore-ssl-errors'
+        ]
+    
+    # 根据浏览器类型启动对应的浏览器
+    if browser_type == 'firefox':
+        browser = playwright.firefox.launch(**launch_options)
+    elif browser_type == 'webkit':
+        browser = playwright.webkit.launch(**launch_options)
+    elif browser_type == 'msedge':
+        launch_options['channel'] = "msedge"
+        browser = playwright.chromium.launch(**launch_options)
+    else:  # 默认使用chromium
+        browser = playwright.chromium.launch(**launch_options)
+
+    # 创建浏览器上下文
+    with open(cert_file, 'rb') as f:
+        ca_cert = f.read()
+
+    with open(key_file, 'rb') as f:
+        ca_key = f.read()
+
+    context = browser.new_context(
+        ignore_https_errors=True,
+        viewport={'width': 1920, 'height': 1080},
+        client_certificates=[{
+            "origin": config['url'],
+            "cert": ca_cert,
+            "key": ca_key
+        }]
+    )
+
+    context.tracing.start(
+        screenshots=True,
+        snapshots=True,
+        sources=True
+    )
+
+    page = context.new_page()
+    yield config,page
+    
+    # 清理资源
+    try:
+        # context.tracing.stop(path="trace.zip")
+        context.close()
+        browser.close()
+        playwright.stop()
+    except Exception as e:
+        print(f"清理资源时出错: {e}")
+

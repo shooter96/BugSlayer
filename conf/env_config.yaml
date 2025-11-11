@@ -1,0 +1,13 @@
+# 浏览器配置
+browser_type: "chromium"
+headless: false
+slow_mo: 1000
+url: "https://10.68.41.12:442"
+
+# 服务器配置
+server:
+  - ip: 10.68.41.12
+    port_443: 443
+    port_442: 442
+    username: admin
+    password: "!QAZ2wsx"
