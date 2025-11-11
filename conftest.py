@@ -8,16 +8,17 @@ from common.data_manager import DataManager
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 @pytest.fixture(scope="session")
-def setup_browser(browser_type=None):
+def setup_browser(request, browser_type=None):
     """
     设置浏览器环境
 
     Args:
+        request: pytest的request对象，可以通过request.param获取参数化的值
         browser_type (str, optional): 浏览器类型，支持 'chromium', 'firefox', 'webkit'。
                                     如果为None，则使用配置中的browser_type
 
     Returns:
-        dict: 包含 playwright, browser, context, page 的字典对象
+        tuple: 包含 (config, page) 的元组对象
     """
     # 加载配置文件
     config_path = str(Path(__file__).parent / "conf" / "env_config.yaml")
@@ -66,11 +67,23 @@ def setup_browser(browser_type=None):
     with open(key_file, 'rb') as f:
         ca_key = f.read()
 
+    # 从request.param获取端口（通过@pytest.mark.parametrize传递）
+    # 如果没有指定端口，则从配置文件读取默认端口
+    if hasattr(request, 'param') and isinstance(request.param, dict):
+        """
+        第一个参数 key: 要获取的键名
+        第二个参数 default (可选): 如果键不存在时返回的默认值
+        """
+        port = request.param.get('port', config["server"][0].get("port_442", 442))
+    else:
+        port = config["server"][0].get("port_442", 442)
+    
+    url = "https://" + str(config["server"][0]["ip"]) + ":" + str(port)
     context = browser.new_context(
         ignore_https_errors=True,
         viewport={'width': 1920, 'height': 1080},
         client_certificates=[{
-            "origin": config['url'],
+            "origin": url,
             "cert": ca_cert,
             "key": ca_key
         }]
@@ -83,7 +96,7 @@ def setup_browser(browser_type=None):
     )
 
     page = context.new_page()
-    yield config,page
+    yield url,config,page
     
     # 清理资源
     try:
