@@ -270,13 +270,13 @@ def login_to_system(page: Page, username=None, password=None):
     if login_button:
         login_button.click()
         logger.info("   ✅ 点击登录按钮")
+
     else:
         logger.error("   ❌ 未找到登录按钮")
         return False
     
-    # 等待登录完成
-    page.wait_for_timeout(2000) 
-    
+    # # 等待登录完成
+    # page.wait_for_timeout(2000)
     return True
 
 def login_to_80_system(page: Page, config, username=None, password=None):

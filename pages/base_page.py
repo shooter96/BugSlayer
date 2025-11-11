@@ -1,9 +1,8 @@
 from playwright.sync_api import Page, Locator, expect
 from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any
-from utils.page_utils import PageUtils
-from utils.logger import get_logger
-from utils.config_reader import ConfigReader
+
+from common.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -18,10 +17,7 @@ class BasePage(ABC):
             page: Playwright页面对象
         """
         self.page = page
-        self.utils = PageUtils(page)
-        self.config = ConfigReader()
-        self.base_url = self.config.get("test.base_url", "https://example.com")
-    
+
     @abstractmethod
     def navigate(self) -> None:
         """导航到页面 - 子类必须实现"""

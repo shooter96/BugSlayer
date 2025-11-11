@@ -24,7 +24,7 @@ def test_login_442_success(setup_browser):
     password = server_info.get('password')
     login_url=url
     logger.info(f"🌐 准备登录到: {login_url}")
-    
+
     # 导航到登录页面
     page.goto(login_url)
     # 执行登录操作

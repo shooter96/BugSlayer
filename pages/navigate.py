@@ -1,9 +1,3 @@
-import json
-import datetime
-from math import log
-import getpass
-from operator import truediv
-import traceback
 from common.logger import get_logger
 from playwright.sync_api import Page, sync_playwright, TimeoutError as PlaywrightTimeoutError
 logger = get_logger(__name__)
