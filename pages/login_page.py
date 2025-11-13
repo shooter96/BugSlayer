@@ -169,7 +169,7 @@ def create_https_page(browser, converted_crt_path, converted_key_path, config, u
         return None
 
 
-def login_to_system(page: Page, login_info: dict) -> None:
+def login_to_system(page: Page, login_info: dict):
     """
     登录系统
     

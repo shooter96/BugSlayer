@@ -124,15 +124,13 @@ def login_success(setup_browser):
     url, config, page = setup_browser
     server_info = config.get('server', [{}])[0]  # 获取第一个服务器配置
     logger.info(f"🖥️ 服务器信息: {config}")
-    username = server_info.get('username')
-    password = server_info.get('password')
     logger.info(f"🌐 准备登录到: {url}")
 
     # 导航到登录页面
     page.goto(url)
     #登录系统
-    login_page.login_to_system(page,username,password)
+    login_page.login_to_system(page,server_info)
     # 返回必要的对象供测试使用
-    return url, config, page
+    return config, page
 
 
