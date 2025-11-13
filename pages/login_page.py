@@ -168,7 +168,8 @@ def create_https_page(browser, converted_crt_path, converted_key_path, config, u
         logger.error(f"   ❌ 创建HTTPS页面失败: {e}")
         return None
 
-def login_to_system(page: Page, username=None, password=None):
+
+def login_to_system(page: Page, login_info: dict) -> None:
     """
     登录系统
     
@@ -181,9 +182,8 @@ def login_to_system(page: Page, username=None, password=None):
     
     Args:
         page: Playwright页面对象，用于执行登录操作
-        username (str, optional): 用户名，如果未提供则需要在调用前设置
-        password (str, optional): 密码，如果未提供则需要在调用前设置
-    
+        login_info:v登录的信息，字典类型
+
     Returns:
         bool: 登录操作结果
             - True: 用户名、密码输入和登录按钮点击均成功
@@ -201,9 +201,14 @@ def login_to_system(page: Page, username=None, password=None):
         - 该函数使用智能选择器匹配，适配多种前端框架
         - 密码在日志中以星号显示，保证安全性
         - 登录完成后需要额外的等待时间确保页面完全加载
-    """        
+    """
+    server_ip = login_info.get('ip')
+    server_port = login_info.get('port_442')
+    username = login_info.get('username')
+    password = login_info.get('password')
+    login_url = f"https://{server_ip}:{server_port}"
     logger.info("3. 等待登录页面...")
-    page.wait_for_timeout(1000)
+    page.goto(login_url)
     
     # 用户名输入
     username_selectors = [
