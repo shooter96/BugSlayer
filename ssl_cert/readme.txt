@@ -6,3 +6,5 @@ openssl rsa -in converted_ie.key -text -noout
 
 # 验证证书
 openssl x509 -in converted_ie.crt -text -noout
+
+# 证书文件名固定格式converted_{type}.crt、converted_{type}.key, type为admin、ie、security、audit

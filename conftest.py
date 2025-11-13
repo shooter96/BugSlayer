@@ -77,7 +77,7 @@ def setup_browser(request, browser_type=None):
     if hasattr(request, 'param') and isinstance(request.param, dict):
         """
         第一个参数 key: 要获取的键名
-        第二个参数 default (可选): 如果键不存在时返回的默认值
+        第二个参数 default (可选): 如果键不存在时设置的默认值
         """
         port = request.param.get('port', server_info.get("port_442", 442))
     else:
