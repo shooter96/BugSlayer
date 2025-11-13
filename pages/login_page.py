@@ -202,11 +202,9 @@ def login_to_system(page: Page, login_info: dict):
         - 密码在日志中以星号显示，保证安全性
         - 登录完成后需要额外的等待时间确保页面完全加载
     """
-    server_ip = login_info.get('ip')
-    server_port = login_info.get('port_442')
     username = login_info.get('username')
     password = login_info.get('password')
-    login_url = f"https://{server_ip}:{server_port}"
+    login_url =login_info.get('url')
     logger.info("3. 等待登录页面...")
     page.goto(login_url)
     

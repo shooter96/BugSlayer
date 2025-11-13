@@ -101,7 +101,8 @@ def setup_browser(request, browser_type=None):
     )
 
     page = context.new_page()
-    yield url,config,page
+    config["server"][0]["url"] = url
+    yield config,page
     
     # 清理资源
     try:
