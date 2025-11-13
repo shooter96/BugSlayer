@@ -10,3 +10,4 @@ server:
     port_442: 442
     username: admin
     password: "!QAZ2wsx"
+    brand: hz

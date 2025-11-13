@@ -37,9 +37,9 @@ def setup_browser(request, browser_type=None):
         'headless': config['headless'],
         'slow_mo': config['slow_mo']
     }
-    
+    brand = config["server"][0].get("brand", "hz")
     # 如果需要客户端证书，可以通过启动参数配置（仅适用于 Chromium）
-    cert_dir = Path(__file__).parent / "ssl_cert" / "hz"
+    cert_dir = Path(__file__).parent / "ssl_cert" / brand
     cert_file = cert_dir / "converted_client.crt"
     key_file = cert_dir / "converted_client.key"
     
