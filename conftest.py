@@ -37,11 +37,13 @@ def setup_browser(request, browser_type=None):
         'headless': config['headless'],
         'slow_mo': config['slow_mo']
     }
-    brand = config["server"][0].get("brand", "hz")
+    server_info = config["server"][0]
+    brand = server_info.get("brand", "hz")
+    cert_type = server_info.get("cert_type", "admin")
     # 如果需要客户端证书，可以通过启动参数配置（仅适用于 Chromium）
     cert_dir = Path(__file__).parent / "ssl_cert" / brand
-    cert_file = cert_dir / "converted_client.crt"
-    key_file = cert_dir / "converted_client.key"
+    cert_file = cert_dir / "converted_{}.crt".format(cert_type)
+    key_file = cert_dir / "converted_{}.key".format(cert_type)
     
     if browser_type in ['chromium', 'msedge'] and cert_file.exists() and key_file.exists():
         # 注意：这种方式需要证书文件在文件系统中可访问
@@ -77,11 +79,11 @@ def setup_browser(request, browser_type=None):
         第一个参数 key: 要获取的键名
         第二个参数 default (可选): 如果键不存在时返回的默认值
         """
-        port = request.param.get('port', config["server"][0].get("port_442", 442))
+        port = request.param.get('port', server_info.get("port_442", 442))
     else:
-        port = config["server"][0].get("port_442", 442)
+        port = server_info.get("port_442", 442)
     
-    url = "https://" + str(config["server"][0]["ip"]) + ":" + str(port)
+    url = "https://" + str(server_info["ip"]) + ":" + str(port)
     context = browser.new_context(
         ignore_https_errors=True,
         viewport={'width': 1920, 'height': 1080},

@@ -11,3 +11,4 @@ server:
     username: admin
     password: "!QAZ2wsx"
     brand: hz
+    cert_type: admin
