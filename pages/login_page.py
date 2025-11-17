@@ -494,7 +494,15 @@ def get_login_data(file_path):
 def get_login_username(page):
     '''
     获取首页登录用户
+    
+    Returns:
+        str: 登录用户名，如果获取失败返回 None
     '''
-    login_name =str(page.locator("#user_role").text_content()).split('：')
-    login_name = str(login_name).split()
-    return login_name
+    try:
+        login_name =str(page.locator("#user_role").text_content()).split('：')[1]
+        return login_name
+    except Exception as e:
+        logger.error(f"❌ 获取首页用户名失败: {e}")
+        return None  # 返回 None 而不是抛出异常
+
+
