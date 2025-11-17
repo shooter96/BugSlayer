@@ -88,6 +88,8 @@ def setup_browser(request, browser_type=None):
     # 方式2: 通过父 fixture 的 request.param 传递
     if hasattr(request, 'param') and isinstance(request.param, dict):
         port = request.param.get('port', server_info.get("port", 442))
+        username = request.param.get('username', server_info.get("username", "admin"))
+        config["server"][0]["username"]=username
         logger.info(f"📌 使用参数化端口: {port}")
     else:
         port = server_info.get("port", 442)
@@ -127,28 +129,29 @@ def setup_browser(request, browser_type=None):
         playwright.stop()
     except Exception as e:
         print(f"清理资源时出错: {e}")
-# @pytest.fixture(scope="session")
-# def login_success(setup_browser):
-#     """
-#     管理员登录fixture
-#
-#     Args:
-#         setup_browser: 从setup_browser fixture获取浏览器环境
-#
-#     Returns:
-#         tuple: 包含 (url, config, page) 的元组对象
-#     """
-#     # 解包setup_browser返回的元组
-#     url, config, page = setup_browser
-#     server_info = config.get('server', [{}])[0]  # 获取第一个服务器配置
-#     logger.info(f"🖥️ 服务器信息: {config}")
-#     logger.info(f"🌐 准备登录到: {url}")
-#
-#     # 导航到登录页面
-#     page.goto(url)
-#     #登录系统
-#     login_page.login_to_system(page,server_info)
-#     # 返回必要的对象供测试使用
-#     return config, page
+@pytest.fixture(scope="class")
+def login_success(setup_browser):
+    """
+    管理员登录fixture
+
+    Args:
+        setup_browser: 从setup_browser fixture获取浏览器环境
+
+    Returns:
+        tuple: 包含 (config, page) 的元组对象
+    """
+    # 解包setup_browser返回的元组
+    config, page = setup_browser
+    server_info = config.get('server', [{}])[0]  # 获取第一个服务器配置
+    url = server_info.get('url')
+    logger.info(f"🖥️ 服务器信息: {config}")
+    logger.info(f"🌐 准备登录到: {url}")
+
+    # 导航到登录页面
+    page.goto(url)
+    #登录系统
+    login_page.login_to_system(page, server_info)
+    # 返回必要的对象供测试使用
+    return config, page
 
 
