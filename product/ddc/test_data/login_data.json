@@ -1,0 +1,9 @@
+{
+  "login_success":
+  [
+    {"username": "admin","password": "!QAZ2wsx","port": 442},
+    {"username": "security","password": "!QAZ2wsx","port": 442},
+    {"username": "audit","password": "!QAZ2wsx","port": 442},
+    {"username": "unimas","password": "!QAZ2wsx","port": 443}
+  ]
+}

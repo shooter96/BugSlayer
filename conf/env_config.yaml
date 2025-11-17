@@ -6,15 +6,13 @@ slow_mo: 1000
 # 服务器配置,默认第一个是内,第二个是外
 server:
   - ip: 10.68.41.12
-    port_443: 443
-    port_442: 442
+    port: 442
     username: admin
     password: "!QAZ2wsx"
     brand: hz #品牌 hz-合众品牌 wy-网御品牌 qm-启明(天清品牌)
     cert_type: admin #用户证书类型 admin、ie
   - ip: 10.68.41.139
-    port_443: 443
-    port_442: 442
+    port: 443
     username: admin
     password: "!QAZ2wsx"
     brand: hz #品牌 hz-合众品牌 wy-网御品牌 qm-启明(天清品牌)

@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from common.data_manager import DataManager
 from common.logger import get_logger
 from playwright.sync_api import Page, sync_playwright, TimeoutError as PlaywrightTimeoutError
 
@@ -483,3 +486,15 @@ def cleanup(playwright, browser, context):
             playwright.stop()
     except Exception as e:
         logger.error(f"停止Playwright时发生错误: {e}")
+
+def get_login_data(file_path):
+    config_path = str(Path(__file__).parent.parent/file_path)
+    config = DataManager.load_json(config_path)
+    return config
+def get_login_username(page):
+    '''
+    获取首页登录用户
+    '''
+    login_name =str(page.locator("#user_role").text_content()).split('：')
+    login_name = str(login_name).split()
+    return login_name

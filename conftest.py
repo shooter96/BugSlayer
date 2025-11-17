@@ -10,10 +10,10 @@ from common.logger import get_logger
 logger = get_logger(__name__)
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")  # 改为 class 级别以支持参数化
 def setup_browser(request, browser_type=None):
     """
-    设置浏览器环境
+    设置浏览器环境（支持参数化）
 
     Args:
         request: pytest的request对象，可以通过request.param获取参数化的值
@@ -22,6 +22,17 @@ def setup_browser(request, browser_type=None):
 
     Returns:
         tuple: 包含 (config, page) 的元组对象
+        
+    参数化支持：
+        - 通过 indirect=True 接收参数化数据
+        - 参数格式：{'port': 端口号, 'browser_type': 浏览器类型}
+        
+    示例：
+        @pytest.mark.parametrize('setup_browser', [{'port': 442}], indirect=True)
+        或者在 fixture 中：
+        @pytest.fixture(params=[{'port': 442}, {'port': 443}])
+        def setup_class_fixture(request, setup_browser):
+            pass
     """
     # 加载配置文件
     config_path = str(Path(__file__).parent / "conf" / "env_config.yaml")
@@ -72,16 +83,15 @@ def setup_browser(request, browser_type=None):
     with open(key_file, 'rb') as f:
         ca_key = f.read()
 
-    # 从request.param获取端口（通过@pytest.mark.parametrize传递）
-    # 如果没有指定端口，则从配置文件读取默认端口
+    # 从request.param获取端口（支持多种参数化方式）
+    # 方式1: 直接参数化 @pytest.mark.parametrize('setup_browser', [{'port': 442}], indirect=True)
+    # 方式2: 通过父 fixture 的 request.param 传递
     if hasattr(request, 'param') and isinstance(request.param, dict):
-        """
-        第一个参数 key: 要获取的键名
-        第二个参数 default (可选): 如果键不存在时设置的默认值
-        """
-        port = request.param.get('port', server_info.get("port_442", 442))
+        port = request.param.get('port', server_info.get("port", 442))
+        logger.info(f"📌 使用参数化端口: {port}")
     else:
-        port = server_info.get("port_442", 442)
+        port = server_info.get("port", 442)
+        logger.info(f"📌 使用默认端口: {port}")
     
     url = "https://" + str(server_info["ip"]) + ":" + str(port)
     context = browser.new_context(
